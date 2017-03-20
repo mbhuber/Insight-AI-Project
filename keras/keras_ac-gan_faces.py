@@ -49,15 +49,54 @@ np.random.seed(1337)
 K.set_image_dim_ordering('th')
 
 imaChan = 3 # image channels
-imageDim = 32 # image size 
-numClass = 10 # number of classes, range = 0,...,numClass-1
+imageDim = 128 # image size
+numClass = 6 # number of classes, range = 0,...,numClass-1
+
+def getData():
+    # Faces
+    with open('../data/faces_wiki_crop_clean_128_images.pkl', 'rb') as handle:
+        imaArr = pickle.load(handle)
+    with open('../data/faces_wiki_crop_clean_128_labels.pkl', 'rb') as handle:
+        imaLabels = pickle.load(handle)
+    print([imaArr.shape,imaLabels.shape])
+
+    # force it to be of shape (..., 1, 28, 28) with range [-1, 1]
+    imaArr = imaArr.transpose((0,3,1,2))
+    print([imaArr.shape,imaLabels.shape])
+    imaArr = (imaArr.astype(np.float32) - 127.5) / 127.5
+
+    # split data
+    ntrain=21000
+
+    X_train, y_train = imaArr[:ntrain], imaLabels[:ntrain]
+    X_test, y_test = imaArr[ntrain:], imaLabels[ntrain:]
+    imaArr, imaLabels=0,0
+    # reduce dimension
+    y_train, y_test = y_train.squeeze(), y_test.squeeze()
+    #X_train = (X_train.astype(np.float32) - 127.5) / 127.5
+    #X_train = np.expand_dims(X_train, axis=1)
+
+    # reduce training set for testing
+    ntrain=1000
+    X_train, y_train = X_train[:ntrain], y_train[:ntrain]
+
+    #X_test = (X_test.astype(np.float32) - 127.5) / 127.5
+    #X_test = np.expand_dims(X_test, axis=1)
+
+    # reduce test set for testing
+    ntest=100
+    X_test, y_test = X_test[:ntest], y_train[:ntest]
+
+    print([X_train.shape,y_train.shape])
+    print([X_test.shape,y_test.shape])
+    return X_train,y_train,X_test,y_test
 
 def build_generator(latent_size):
     # we will map a pair of (z, L), where z is a latent vector and L is a
     # label drawn from P_c, to image space (..., 1, 28, 28)
-    
+
     idim = imageDim
-    
+
     cnn = Sequential()
 
     cnn.add(Dense(1024, input_dim=latent_size, activation='relu'))
@@ -143,6 +182,10 @@ if __name__ == '__main__':
 	adam_lr = 0.0002
 	adam_beta_1 = 0.5
 
+    #get data
+  X_train, y_train, X_test, y_test = 0,0,0,0#getData()
+  nb_train, nb_test = X_train.shape[0], X_test.shape[0]
+
 	# build the discriminator
 	discriminator = build_discriminator()
 	discriminator.compile(
@@ -170,34 +213,6 @@ if __name__ == '__main__':
 	    optimizer=Adam(lr=adam_lr, beta_1=adam_beta_1),
 	    loss=['binary_crossentropy', 'sparse_categorical_crossentropy']
 	)
-
-	# CIFAR10
-
-	# get our mnist data, and force it to be of shape (..., 1, 28, 28) with
-	# range [-1, 1]
-	(X_train, y_train), (X_test, y_test) = cifar10.load_data()
-	#X_train, X_test = X_train[:,1,:], X_test[:,1,:]
-
-	# reduce dimension
-	y_train, y_test = y_train.squeeze(), y_test.squeeze()
-
-	X_train = (X_train.astype(np.float32) - 127.5) / 127.5
-	#X_train = np.expand_dims(X_train, axis=1)
-
-	# reduce training set for testing
-	ntrain=1000
-	X_train, y_train = X_train[:ntrain], y_train[:ntrain]
-
-	X_test = (X_test.astype(np.float32) - 127.5) / 127.5
-	#X_test = np.expand_dims(X_test, axis=1)
-
-	# reduce test set for testing
-	ntest=100
-	X_test, y_test = X_test[:ntest], y_train[:ntest]
-
-	print([X_train.shape,y_train.shape])
-	print([X_test.shape,y_test.shape])
-	nb_train, nb_test = X_train.shape[0], X_test.shape[0]
 
 	train_history = defaultdict(list)
 	test_history = defaultdict(list)
@@ -333,7 +348,7 @@ if __name__ == '__main__':
 	        img = (np.concatenate([r.transpose(0,2,3,1).reshape(-1, imageDim,3)
 	                           for r in np.split(generated_images, 10)
 	                           ], axis=1) * 127.5 + 127.5).astype(np.uint8)
-	        
+
 
 	    Image.fromarray(img).save(
 	        'plot_epoch_{0:03d}_generated.png'.format(epoch))
