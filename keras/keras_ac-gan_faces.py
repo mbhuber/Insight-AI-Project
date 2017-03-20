@@ -182,9 +182,9 @@ if __name__ == '__main__':
 	adam_lr = 0.0002
 	adam_beta_1 = 0.5
 
-    #get data
-  X_train, y_train, X_test, y_test = 0,0,0,0#getData()
-  nb_train, nb_test = X_train.shape[0], X_test.shape[0]
+        #get data
+        X_train, y_train, X_test, y_test = getData()
+        nb_train, nb_test = X_train.shape[0], X_test.shape[0]
 
 	# build the discriminator
 	discriminator = build_discriminator()
