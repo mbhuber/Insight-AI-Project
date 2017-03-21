@@ -77,15 +77,15 @@ def getData():
     #X_train = np.expand_dims(X_train, axis=1)
 
     # reduce training set for testing
-    ntrain=1000
-    X_train, y_train = X_train[:ntrain], y_train[:ntrain]
+    #ntrain=1000
+    #X_train, y_train = X_train[:ntrain], y_train[:ntrain]
 
     #X_test = (X_test.astype(np.float32) - 127.5) / 127.5
     #X_test = np.expand_dims(X_test, axis=1)
 
     # reduce test set for testing
-    ntest=100
-    X_test, y_test = X_test[:ntest], y_train[:ntest]
+    #ntest=100
+    #X_test, y_test = X_test[:ntest], y_train[:ntest]
 
     print([X_train.shape,y_train.shape])
     print([X_test.shape,y_test.shape])
@@ -174,7 +174,7 @@ def build_discriminator():
 if __name__ == '__main__':
 
     # batch and latent size taken from the paper
-	nb_epochs = 1#50
+	nb_epochs = 20#50
 	batch_size = 32#100
 	latent_size = 100
 
