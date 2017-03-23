@@ -55,9 +55,9 @@ numClass = 6 # number of classes, range = 0,...,numClass-1
 
 def getData():
     # Faces
-    with open('../data/faces_wiki_crop_clean_64_aligned_images.pkl', 'rb') as handle:
+    with open('../data/faces_imdb-wiki_cc_align64_images.pkl', 'rb') as handle:
         imaArr = pickle.load(handle)
-    with open('../data/faces_wiki_crop_clean_64_aligned_labels.pkl', 'rb') as handle:
+    with open('../data/faces_imdb-wiki_cc_align64_labels.pkl', 'rb') as handle:
         imaLabels = pickle.load(handle)
     print([imaArr.shape,imaLabels.shape])
 
@@ -67,7 +67,7 @@ def getData():
     imaArr = (imaArr.astype(np.float32) - 127.5) / 127.5
 
     # split data
-    ntrain=22000
+    ntrain=55000
 
     X_train, y_train = imaArr[:ntrain], imaLabels[:ntrain]
     X_test, y_test = imaArr[ntrain:], imaLabels[ntrain:]
@@ -206,7 +206,7 @@ if __name__ == '__main__':
 	fake = generator([latent, image_class])
 
 	# we only want to be able to train generation for the combined model
-	discriminator.trainable = True #False
+	discriminator.trainable = False
 	fake, aux = discriminator(fake)
 	combined = Model(input=[latent, image_class], output=[fake, aux])
 
@@ -343,11 +343,11 @@ if __name__ == '__main__':
 	    # arrange them into a grid
 	    if imaChan==1:
 	        img = (np.concatenate([r.reshape(-1, imageDim)
-	                               for r in np.split(generated_images, 10)
+	                               for r in np.split(generated_images, numClass)
 	                               ], axis=-1) * 127.5 + 127.5).astype(np.uint8)
 	    else:
 	        img = (np.concatenate([r.transpose(0,2,3,1).reshape(-1, imageDim,3)
-	                           for r in np.split(generated_images, 10)
+	                           for r in np.split(generated_images, numClass)
 	                           ], axis=1) * 127.5 + 127.5).astype(np.uint8)
 
 
