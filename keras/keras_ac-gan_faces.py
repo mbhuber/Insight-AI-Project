@@ -36,7 +36,7 @@ from six.moves import range
 
 import keras.backend as K
 from keras.datasets import cifar10#mnist
-from keras.layers import Input, Dense, Reshape, Flatten, Embedding, merge, Dropout
+from keras.layers import Input, Dense, Reshape, Flatten, Embedding, merge, Dropout, BatchNormalization
 from keras.layers.advanced_activations import LeakyReLU
 from keras.layers.convolutional import UpSampling2D, Convolution2D
 from keras.models import Sequential, Model
@@ -102,6 +102,7 @@ def build_generator(latent_size):
 
     cnn.add(Dense(1024, input_dim=latent_size, activation='relu'))
     cnn.add(Dense(128 * idim/4 * idim/4, activation='relu'))
+    cnn.add(BatchNormalization()) 
     cnn.add(Reshape((128, idim/4, idim/4)))
 
     # upsample to (..., idim/2, idim/2)
@@ -175,7 +176,7 @@ def build_discriminator():
 if __name__ == '__main__':
 
     # batch and latent size taken from the paper
-	nb_epochs = 50
+	nb_epochs = 20
 	batch_size = 100#32#100
 	latent_size = 100
 
