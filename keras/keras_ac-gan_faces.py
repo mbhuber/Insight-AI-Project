@@ -49,14 +49,15 @@ np.random.seed(1337)
 K.set_image_dim_ordering('th')
 
 imaChan = 3 # image channels
-imageDim = 128 # image size
+
+imageDim = 64 # image size
 numClass = 6 # number of classes, range = 0,...,numClass-1
 
 def getData():
     # Faces
-    with open('../data/faces_wiki_crop_clean_128_images.pkl', 'rb') as handle:
+    with open('../data/faces_wiki_crop_clean_64_aligned_images.pkl', 'rb') as handle:
         imaArr = pickle.load(handle)
-    with open('../data/faces_wiki_crop_clean_128_labels.pkl', 'rb') as handle:
+    with open('../data/faces_wiki_crop_clean_64_aligned_labels.pkl', 'rb') as handle:
         imaLabels = pickle.load(handle)
     print([imaArr.shape,imaLabels.shape])
 
@@ -66,7 +67,7 @@ def getData():
     imaArr = (imaArr.astype(np.float32) - 127.5) / 127.5
 
     # split data
-    ntrain=21000
+    ntrain=22000
 
     X_train, y_train = imaArr[:ntrain], imaLabels[:ntrain]
     X_test, y_test = imaArr[ntrain:], imaLabels[ntrain:]
@@ -174,8 +175,8 @@ def build_discriminator():
 if __name__ == '__main__':
 
     # batch and latent size taken from the paper
-	nb_epochs = 20#50
-	batch_size = 32#100
+	nb_epochs = 50
+	batch_size = 100#32#100
 	latent_size = 100
 
 	# Adam parameters suggested in https://arxiv.org/abs/1511.06434
