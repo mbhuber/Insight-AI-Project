@@ -53,7 +53,7 @@ imageDim = 64 # image size
 numClass = 6 # number of classes, range = 0,...,numClass-1
 
 # batch and latent size taken from the paper
-nb_epochs = 20
+nb_epochs = 50
 batch_size = 100
 latent_size = 100
 
@@ -219,6 +219,12 @@ if __name__ == '__main__':
 	train_history = defaultdict(list)
 	test_history = defaultdict(list)
 
+    # for data shuffling
+    allIdx = list(range(X_train.shape[0]))
+
+    # fix the shown examples
+    noiseExamples = np.random.uniform(-1, 1, (10*numClass, latent_size))
+
 	ct = time.time()
 	for epoch in range(nb_epochs):
 	    print('Epoch {} of {}'.format(epoch + 1, nb_epochs))
@@ -229,14 +235,18 @@ if __name__ == '__main__':
 	    epoch_gen_loss = []
 	    epoch_disc_loss = []
 
+        # shuffle order of training data
+        np.random.shuffle(allIdx)
+
 	    for index in range(nb_batches):
 	        progress_bar.update(index)
 	        # generate a new batch of noise
 	        noise = np.random.uniform(-1, 1, (batch_size, latent_size))
 
 	        # get a batch of real images
-	        image_batch = X_train[index * batch_size:(index + 1) * batch_size]
-	        label_batch = y_train[index * batch_size:(index + 1) * batch_size]
+            batchIdx = allIdx[index * batch_size:(index + 1) * batch_size]
+	        image_batch = X_train[batchIdx]
+	        label_batch = y_train[batchIdx]
 
 	        # sample some labels from p_c
 	        sampled_labels = np.random.randint(0, numClass, batch_size)
@@ -292,7 +302,7 @@ if __name__ == '__main__':
 	    discriminator_train_loss = np.mean(np.array(epoch_disc_loss), axis=0)
 
 	    # make new noise
-	    noise = np.random.uniform(-1, 1, (2 * nb_test, latent_size))
+	    noise = np.random.uniform(-1, 1, (10*numClass, latent_size))
 	    sampled_labels = np.random.randint(0, numClass, 2 * nb_test)
 
 	    trick = np.ones(2 * nb_test)
@@ -331,7 +341,7 @@ if __name__ == '__main__':
 	        'params_discriminator_epoch_{0:03d}.hdf5'.format(epoch), True)
 
 	    # generate some digits to display
-	    noise = np.random.uniform(-1, 1, (10*numClass, latent_size))
+	    noise = noiseExamples
 
 	    sampled_labels = np.array([
 	        [i] * 10 for i in range(numClass)

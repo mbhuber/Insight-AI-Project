@@ -213,6 +213,12 @@ if __name__ == '__main__':
     train_history = defaultdict(list)
     test_history = defaultdict(list)
 
+    # for data shuffling
+    allIdx = list(range(X_train.shape[0]))
+
+    # fix the shown examples
+    noiseExamples = np.random.normal(0, 1, (10*numClass, latent_size))
+
     ct = time.time()
     for epoch in range(nb_epochs):
         print('Epoch {} of {}'.format(epoch + 1, nb_epochs))
@@ -222,6 +228,9 @@ if __name__ == '__main__':
 
         epoch_gen_loss = []
         epoch_disc_loss = []
+
+        # shuffle order of training data
+        np.random.shuffle(allIdx)
 
         for index in range(nb_batches):
             if len(epoch_gen_loss) + len(epoch_disc_loss) > 1:
@@ -233,8 +242,9 @@ if __name__ == '__main__':
             noise = np.random.normal(0, 1, (batch_size, latent_size))
 
             # get a batch of real images
-            image_batch = X_train[index * batch_size:(index + 1) * batch_size]
-            label_batch = y_train[index * batch_size:(index + 1) * batch_size]
+            batchIdx = allIdx[index * batch_size:(index + 1) * batch_size]
+	        image_batch = X_train[batchIdx]
+	        label_batch = y_train[batchIdx]
 
             # sample some labels from p_c
             sampled_labels = np.random.randint(0, numClass, batch_size)
@@ -332,7 +342,7 @@ if __name__ == '__main__':
 
         # generate some digits to display
         #noise = np.random.uniform(-1, 1, (100, latent_size))
-        noise = np.random.normal(0, 1, (10*numClass, latent_size))
+        noise = noiseExamples
 
         sampled_labels = np.array([
             [i] * 10 for i in range(numClass)
