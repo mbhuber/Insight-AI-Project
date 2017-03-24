@@ -36,7 +36,7 @@ from six.moves import range
 
 import keras.backend as K
 from keras.datasets import cifar10#mnist
-from keras.layers import Input, Dense, Reshape, Flatten, Embedding, merge, Dropout, BatchNormalization
+from keras.layers import Input, Dense, Reshape, Flatten, Embedding, merge, Dropout
 from keras.layers.advanced_activations import LeakyReLU
 from keras.layers.convolutional import UpSampling2D, Convolution2D
 from keras.models import Sequential, Model
@@ -49,17 +49,9 @@ np.random.seed(1337)
 K.set_image_dim_ordering('th')
 
 imaChan = 3 # image channels
+
 imageDim = 64 # image size
 numClass = 6 # number of classes, range = 0,...,numClass-1
-
-# batch and latent size taken from the paper
-nb_epochs = 50
-batch_size = 100
-latent_size = 100
-
-# Adam parameters suggested in https://arxiv.org/abs/1511.06434
-adam_lr = 0.0002
-adam_beta_1 = 0.5
 
 def getData():
     # Faces
@@ -110,7 +102,6 @@ def build_generator(latent_size):
 
     cnn.add(Dense(1024, input_dim=latent_size, activation='relu'))
     cnn.add(Dense(128 * idim/4 * idim/4, activation='relu'))
-    cnn.add(BatchNormalization())
     cnn.add(Reshape((128, idim/4, idim/4)))
 
     # upsample to (..., idim/2, idim/2)
@@ -177,12 +168,20 @@ def build_discriminator():
     # (name=auxiliary) is the class that the discriminator thinks the image
     # belongs to.
     fake = Dense(1, activation='sigmoid', name='generation')(features)
-    aux = Dense(numClass, activation='softmax', name='auxiliary')(features)
+    aux = Dense(10, activation='softmax', name='auxiliary')(features)
 
     return Model(input=image, output=[fake, aux])
 
 if __name__ == '__main__':
 
+    # batch and latent size taken from the paper
+	nb_epochs = 50
+	batch_size = 100#32#100
+	latent_size = 100
+
+	# Adam parameters suggested in https://arxiv.org/abs/1511.06434
+	adam_lr = 0.0002
+	adam_beta_1 = 0.5
 
         #get data
         X_train, y_train, X_test, y_test = getData()
@@ -293,7 +292,7 @@ if __name__ == '__main__':
 
 	    # make new noise
 	    noise = np.random.uniform(-1, 1, (2 * nb_test, latent_size))
-	    sampled_labels = np.random.randint(0, numClass, 2 * nb_test)
+	    sampled_labels = np.random.randint(0, 10, 2 * nb_test)
 
 	    trick = np.ones(2 * nb_test)
 
