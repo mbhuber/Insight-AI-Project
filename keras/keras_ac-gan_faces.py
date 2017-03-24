@@ -44,6 +44,10 @@ from keras.optimizers import Adam
 from keras.utils.generic_utils import Progbar
 import numpy as np
 
+import os
+import tensorflow as tf
+import keras.backend.tensorflow_backend as KTF
+
 np.random.seed(1337)
 
 K.set_image_dim_ordering('th')
@@ -99,6 +103,18 @@ def getData():
     print([X_train.shape,y_train.shape])
     print([X_test.shape,y_test.shape])
     return X_train,y_train,X_test,y_test
+
+def get_session(gpu_fraction=0.5):
+    '''Assume that you have 6GB of GPU memory and want to allocate ~2GB'''
+
+    num_threads = os.environ.get('OMP_NUM_THREADS')
+    gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=gpu_fraction)
+
+    if num_threads:
+        return tf.Session(config=tf.ConfigProto(
+            gpu_options=gpu_options, intra_op_parallelism_threads=num_threads))
+    else:
+        return tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
 
 def build_generator(latent_size):
     # we will map a pair of (z, L), where z is a latent vector and L is a
@@ -183,6 +199,7 @@ def build_discriminator():
 
 if __name__ == '__main__':
 
+    KTF.set_session(get_session())
 
         #get data
         X_train, y_train, X_test, y_test = getData()
@@ -302,7 +319,7 @@ if __name__ == '__main__':
 	    discriminator_train_loss = np.mean(np.array(epoch_disc_loss), axis=0)
 
 	    # make new noise
-	    noise = np.random.uniform(-1, 1, (10*numClass, latent_size))
+	    noise = np.random.uniform(-1, 1, (2 * nb_test, latent_size))
 	    sampled_labels = np.random.randint(0, numClass, 2 * nb_test)
 
 	    trick = np.ones(2 * nb_test)
