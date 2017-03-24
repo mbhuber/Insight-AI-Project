@@ -53,7 +53,7 @@ imageDim = 64 # image size
 numClass = 6 # number of classes, range = 0,...,numClass-1
 
 # batch and latent size taken from the paper
-nb_epochs = 20
+nb_epochs = 10
 batch_size = 100
 latent_size = 100
 
@@ -104,7 +104,7 @@ def build_generator(latent_size):
     cnn.add(LeakyReLU())
     cnn.add(Dense(128 * idim/4 * idim/4))
     cnn.add(LeakyReLU())
-    cnn.add(BatchNormalization())
+    #cnn.add(BatchNormalization())
     cnn.add(Reshape((128, idim/4, idim/4)))
 
     # upsample to (..., idim/2, idim/2)
