@@ -146,7 +146,7 @@ def build_discriminator():
     cnn = Sequential()
     #cnn.add(GaussianNoise(0.2, input_shape=(1, 28, 28)))
     cnn.add(Convolution2D(32, 3, 3, border_mode='same', subsample=(2, 2),
-                          input_shape=(imaChan, imaDim, imaDim)))
+                          input_shape=(imaChan, imageDim, imageDim)))
     cnn.add(LeakyReLU())
     cnn.add(Dropout(0.3))
 
