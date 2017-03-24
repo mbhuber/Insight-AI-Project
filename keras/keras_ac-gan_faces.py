@@ -49,9 +49,17 @@ np.random.seed(1337)
 K.set_image_dim_ordering('th')
 
 imaChan = 3 # image channels
-
 imageDim = 64 # image size
 numClass = 6 # number of classes, range = 0,...,numClass-1
+
+# batch and latent size taken from the paper
+nb_epochs = 50
+batch_size = 100
+latent_size = 100
+
+# Adam parameters suggested in https://arxiv.org/abs/1511.06434
+adam_lr = 0.0002
+adam_beta_1 = 0.5
 
 def getData():
     # Faces
