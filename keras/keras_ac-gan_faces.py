@@ -102,7 +102,7 @@ def build_generator(latent_size):
 
     cnn.add(Dense(1024, input_dim=latent_size, activation='relu'))
     cnn.add(Dense(128 * idim/4 * idim/4, activation='relu'))
-    cnn.add(BatchNormalization()) 
+    cnn.add(BatchNormalization())
     cnn.add(Reshape((128, idim/4, idim/4)))
 
     # upsample to (..., idim/2, idim/2)
@@ -169,20 +169,12 @@ def build_discriminator():
     # (name=auxiliary) is the class that the discriminator thinks the image
     # belongs to.
     fake = Dense(1, activation='sigmoid', name='generation')(features)
-    aux = Dense(10, activation='softmax', name='auxiliary')(features)
+    aux = Dense(numClass, activation='softmax', name='auxiliary')(features)
 
     return Model(input=image, output=[fake, aux])
 
 if __name__ == '__main__':
 
-    # batch and latent size taken from the paper
-	nb_epochs = 20
-	batch_size = 100#32#100
-	latent_size = 100
-
-	# Adam parameters suggested in https://arxiv.org/abs/1511.06434
-	adam_lr = 0.0002
-	adam_beta_1 = 0.5
 
         #get data
         X_train, y_train, X_test, y_test = getData()
