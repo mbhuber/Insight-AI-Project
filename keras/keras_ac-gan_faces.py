@@ -219,11 +219,11 @@ if __name__ == '__main__':
 	train_history = defaultdict(list)
 	test_history = defaultdict(list)
 
-    # for data shuffling
-    allIdx = list(range(X_train.shape[0]))
+        # for data shuffling
+        allIdx = list(range(X_train.shape[0]))
 
-    # fix the shown examples
-    noiseExamples = np.random.uniform(-1, 1, (10*numClass, latent_size))
+        # fix the shown examples
+        noiseExamples = np.random.uniform(-1, 1, (10*numClass, latent_size))
 
 	ct = time.time()
 	for epoch in range(nb_epochs):
@@ -235,8 +235,8 @@ if __name__ == '__main__':
 	    epoch_gen_loss = []
 	    epoch_disc_loss = []
 
-        # shuffle order of training data
-        np.random.shuffle(allIdx)
+            # shuffle order of training data
+            np.random.shuffle(allIdx)
 
 	    for index in range(nb_batches):
 	        progress_bar.update(index)
@@ -244,7 +244,7 @@ if __name__ == '__main__':
 	        noise = np.random.uniform(-1, 1, (batch_size, latent_size))
 
 	        # get a batch of real images
-            batchIdx = allIdx[index * batch_size:(index + 1) * batch_size]
+                batchIdx = allIdx[index * batch_size:(index + 1) * batch_size]
 	        image_batch = X_train[batchIdx]
 	        label_batch = y_train[batchIdx]
 
