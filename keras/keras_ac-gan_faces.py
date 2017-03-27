@@ -198,8 +198,7 @@ def build_discriminator():
     return Model(input=image, output=[fake, aux])
 
 if __name__ == '__main__':
-
-    KTF.set_session(get_session())
+	KTF.set_session(get_session(0.5))
 
         #get data
         X_train, y_train, X_test, y_test = getData()
