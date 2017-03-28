@@ -367,7 +367,7 @@ if __name__ == '__main__':
         Image.fromarray(img).save(
             'plot_epoch_{0:03d}_generated.png'.format(epoch))
 
-    pickle.dump({'train': train_history, 'test': test_history},
+        pickle.dump({'train': train_history, 'test': test_history},
                 open('acgan-history.pkl', 'wb'))
 
     print("Elapsed time= {} min".format((time.time()-ct)/60.))
