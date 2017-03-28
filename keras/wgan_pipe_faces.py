@@ -56,15 +56,15 @@ imageDim = 128 # image size
 
 # batch and latent size taken from the paper
 nb_epochs = 50
-batch_size = 128
-test_batch_size = 1000
+batch_size = 64
+test_batch_size = 256
 latent_size = 100
 
 # Adam parameters suggested in https://arxiv.org/abs/1511.06434
 adam_lr = 0.0002
 adam_beta_1 = 0.5
 
-pipePath = '../../data/imdb-wiki_crop_clean_align64_kerasPipe/'
+pipePath = '../../data/imdb-wiki_crop_clean_align128_kerasPipe/'
 
 def createImageGenerator(imageDir,batchSize,targetSize):
     return ImageDataGenerator().flow_from_directory(
@@ -226,7 +226,7 @@ if __name__ == '__main__':
         epoch_gen_loss = []
         epoch_disc_loss = []
 
-        for index in range(3):#nb_batches):
+        for index in range(nb_batches):
             if len(epoch_gen_loss) + len(epoch_disc_loss) > 1:
                 progress_bar.update(index, values=[('disc_loss',np.mean(np.array(epoch_disc_loss),axis=0)[0]), ('gen_loss', np.mean(np.array(epoch_gen_loss),axis=0)[0])])
             else:
