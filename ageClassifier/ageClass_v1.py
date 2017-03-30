@@ -27,11 +27,11 @@ def setDataParameters():
 
 def setModelParameters():
     batchSize   = 128
-    np_epoch    =  50
+    nb_epoch    =  50
     return (batchSize, nb_epoch)
 
 def setDataPaths():
-    pipePath = '../../data/imdb-wiki_crop_clean_align128_kerasPipe3/'
+    pipePath = '../../data/imdb-wiki_crop_clean_align64_kerasPipe3/'
     trainDir = pipePath + "train/"
     testDir  = pipePath + "valid/"
     return (trainDir, testDir)
