@@ -21,14 +21,14 @@ from keras.callbacks import TensorBoard
 K.set_image_dim_ordering('th')
 
 def setDataParameters():
-    imaDim   = 128
+    imaDim   = 64
     numClass = 6
     return (imaDim,numClass)
 
 def setModelParameters():
-    batchSize   = 32
-
-    return (batchSize)
+    batchSize   = 128
+    np_epoch    =  50
+    return (batchSize, nb_epoch)
 
 def setDataPaths():
     pipePath = '../../data/imdb-wiki_crop_clean_align128_kerasPipe3/'
@@ -82,8 +82,8 @@ if __name__ == '__main__':
     ct = time.time()
 
     # parameters
-    imaDim, numClass =setDataParameters()
-    batchSize       =setModelParameters()
+    imaDim, numClass     =setDataParameters()
+    batchSize, nb_epoch  =setModelParameters()
 
     # data
     trainDir, testDir = setDataPaths()
@@ -102,10 +102,10 @@ if __name__ == '__main__':
 
     mhist= model.fit_generator(
         generator=train_generator,
-        samples_per_epoch=10* batchSize,
-        nb_epoch=10,
+        samples_per_epoch=train_generator.n/10,
+        nb_epoch=nb_epoch,
         validation_data= valid_generator,
-        nb_val_samples= valid_generator.n/100,
+        nb_val_samples= valid_generator.n/10,
         callbacks=[TensorBoard(log_dir='/tmp/ageClass_v1')])
 
     model.save("ageClass_model.h5")
