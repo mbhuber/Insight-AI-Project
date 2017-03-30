@@ -53,7 +53,7 @@ np.random.seed(1331)
 K.set_image_dim_ordering('th')
 
 imaChan = 3 # image channels
-imageDim = 128 # image size
+imageDim = 64 # image size
 
 # batch and latent size taken from the paper
 nb_epochs = 20
@@ -65,7 +65,7 @@ latent_size = 100
 adam_lr = 0.0002
 adam_beta_1 = 0.5
 
-pipePath = '../../data/imdb-wiki_crop_clean_align128_kerasPipe3/'
+pipePath = '../../data/imdb-wiki_crop_clean_align64_kerasPipe3/'
 
 def createImageGenerator(imageDir,batchSize,targetSize):
     return ImageDataGenerator().flow_from_directory(
@@ -95,16 +95,25 @@ def build_generator(latent_size):
 
     cnn.add(Dense(1024, input_dim=latent_size))
     cnn.add(LeakyReLU())
-    cnn.add(Dense(128 * idim/4 * idim/4))
+    cnn.add(BatchNormalization())
+
+    cnn.add(Dense(1024 * idim/16 * idim/16))
     cnn.add(LeakyReLU())
-    #cnn.add(BatchNormalization())
-    cnn.add(Reshape((128, idim/4, idim/4)))
+    cnn.add(BatchNormalization())
+    cnn.add(Reshape((1024, idim/16, idim/16)))
+
+    # upsample to (..., idim/2, idim/2)
+    cnn.add(UpSampling2D(size=(2, 2)))
+    cnn.add(Convolution2D(512, 5, 5, border_mode='same',
+                          init='glorot_uniform'))
+    cnn.add(LeakyReLU())
 
     # upsample to (..., idim/2, idim/2)
     cnn.add(UpSampling2D(size=(2, 2)))
     cnn.add(Convolution2D(256, 5, 5, border_mode='same',
                           init='glorot_uniform'))
     cnn.add(LeakyReLU())
+
 
     # upsample to (..., idim, idim)
     cnn.add(UpSampling2D(size=(2, 2)))
@@ -113,6 +122,7 @@ def build_generator(latent_size):
     cnn.add(LeakyReLU())
 
     # take a channel axis reduction
+    cnn.add(UpSampling2D(size=(2, 2)))
     cnn.add(Convolution2D(imaChan, 2, 2, border_mode='same',
                           activation='tanh', init='glorot_uniform'))
 
@@ -149,7 +159,7 @@ def build_discriminator():
 #    cnn.add(Convolution2D(64, 3, 3, border_mode='same', subsample=(1, 1)))
     cnn.add(Convolution2D(64, 3, 3, border_mode='same'))
     cnn.add(LeakyReLU())
-    #cnn.add(AveragePooling2D(pool_size=(2,2)))
+    cnn.add(AveragePooling2D(pool_size=(2,2)))
     cnn.add(Dropout(0.3))
 
     #cnn.add(Convolution2D(128, 3, 3, border_mode='same', subsample=(2, 2)))
@@ -161,7 +171,7 @@ def build_discriminator():
     #cnn.add(Convolution2D(256, 3, 3, border_mode='same', subsample=(1, 1)))
     cnn.add(Convolution2D(256, 3, 3, border_mode='same'))
     cnn.add(LeakyReLU())
-    #cnn.AveragePooling2D(pool_size=(2,2))
+    cnn.add(AveragePooling2D(pool_size=(2,2)))
     cnn.add(Dropout(0.3))
 
     cnn.add(Flatten())
@@ -182,7 +192,7 @@ def build_discriminator():
 if __name__ == '__main__':
     # for create image generators
     trainGenerator = createImageGenerator(pipePath+'train/',batch_size,(imageDim,imageDim))
-    testGenerator  = createImageGenerator(pipePath+'test/' ,test_batch_size,(imageDim,imageDim))
+    testGenerator  = createImageGenerator(pipePath+'valid/' ,test_batch_size,(imageDim,imageDim))
 
     nb_train, nb_test = trainGenerator.n, testGenerator.n
     print("# train: {}, # test: {}".format(nb_train,nb_test))
