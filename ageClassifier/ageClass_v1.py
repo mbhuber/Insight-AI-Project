@@ -3,6 +3,7 @@ import os, shutil
 import numpy as np
 import time
 import matplotlib.pyplot as plt
+import cPickle as pickle
 
 from keras import applications
 from keras.models import Sequential
@@ -44,6 +45,7 @@ def createImageGenerator(imageDir,batchSize,targetSize):
         class_mode='categorical')  # since we use binary_crossentropy loss, we need binary labels
 
 def getModelArch(imaDim=128, numClass=6):
+    dop =0.5
     model = Sequential()
     model.add(Lambda(lambda x: x/127.5-0.5, input_shape=(3, imaDim, imaDim)))
 
@@ -56,23 +58,25 @@ def getModelArch(imaDim=128, numClass=6):
     model.add(Activation('relu'))
     model.add(BatchNormalization(axis=1))
     model.add(MaxPooling2D(pool_size=(2, 2)))
+    model.add(Dropout(0.3))
 
     model.add(Conv2D(128, 3, 3))
     model.add(Activation('relu'))
     model.add(BatchNormalization(axis=1))
     model.add(MaxPooling2D(pool_size=(2, 2)))
+    model.add(Dropout(0.3))
 
     model.add(Flatten())  # this converts our 3D feature maps to 1D feature vectors
 
     model.add(Dense(256))
     model.add(Activation('relu'))
     model.add(BatchNormalization())
-    model.add(Dropout(0.5))
+    model.add(Dropout(dop))
 
     model.add(Dense(64))
     model.add(Activation('relu'))
     model.add(BatchNormalization())
-    model.add(Dropout(0.5))
+    model.add(Dropout(dop))
 
     model.add(Dense(numClass))
     model.add(Activation('softmax'))
@@ -102,11 +106,12 @@ if __name__ == '__main__':
 
     mhist= model.fit_generator(
         generator=train_generator,
-        samples_per_epoch=train_generator.n/10,
+        samples_per_epoch=train_generator.n/2,
         nb_epoch=nb_epoch,
         validation_data= valid_generator,
         nb_val_samples= valid_generator.n/10,
         callbacks=[TensorBoard(log_dir='/tmp/ageClass_v1')])
 
     model.save("ageClass_model.h5")
+    pickle.dump(mhist.history,open("modelHistory.pkl","wb"))
     print("time= {} min".format((time.time()-ct)/60.))
