@@ -57,12 +57,12 @@ np.random.seed(1337)
 
 K.set_image_dim_ordering('th')
 
-imaChan = 3 # image channels
+imaChan = 50 # image channels
 imageDim = 64 # image size
 
 # batch and latent size taken from the paper
 nb_epochs = 3
-batch_size = 64
+batch_size = 128
 test_batch_size = 256
 latent_size = 100
 
