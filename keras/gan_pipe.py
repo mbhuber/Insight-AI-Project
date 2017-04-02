@@ -70,7 +70,7 @@ latent_size = 100
 adam_lr = 0.0002
 adam_beta_1 = 0.5
 
-pipePath = '../../data/imdb-wiki_crop_clean_align64_kerasPipe3/'
+pipePath = '../../../data/imdb-wiki_crop_clean_align64_kerasPipe4/'
 
 def createImageGenerator(imageDir,batchSize,targetSize):
     return ImageDataGenerator().flow_from_directory(
@@ -234,8 +234,7 @@ if __name__ == '__main__':
         trainGenerator.reset() # enforce shuffling in each epoch
         testGenerator.reset()
 
-        for index in range(3):#nb_batches):
-            print(index)
+        for index in range(nb_batches):
             if len(epoch_gen_loss) + len(epoch_disc_loss) > 1:
                 progress_bar.update(index, values=[('disc_loss',np.mean(np.array(epoch_disc_loss),axis=0)[0]), ('gen_loss', np.mean(np.array(epoch_gen_loss),axis=0)[0])])
             else:
