@@ -20,7 +20,7 @@ import keras.backend as K
 
 from keras.callbacks import TensorBoard
 
-K.set_image_dim_ordering('th')
+K.set_image_dim_ordering('tf')
 
 def setDataParameters():
     imaDim   = 64
@@ -45,13 +45,13 @@ def createImageGenerator(imageDir,batchSize,targetSize):
         batch_size=batchSize,
         class_mode='categorical')  # since we use binary_crossentropy loss, we need binary labels
 
-def getModelArch(imaDim=128, numClass=6):
+def getModelArch(imaDim, numClass):
     dop =0.5
 
-    vgg = applications.VGG16(weights='imagenet', include_top=False, input_shape=(3,imaDim,imaDim))
+    vgg = applications.VGG16(weights='imagenet', include_top=False, input_shape=(imaDim,imaDim,3))
 
     model = Sequential()
-    model.add(Lambda(lambda x: x/127.5-0.5, input_shape=(3, imaDim, imaDim)))
+    model.add(Lambda(lambda x: x/127.5-0.5, input_shape=(imaDim, imaDim,3)))
     model.add(vgg)
 
     model.add(Flatten())  # this converts our 3D feature maps to 1D feature vectors
