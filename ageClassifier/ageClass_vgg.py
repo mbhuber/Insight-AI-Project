@@ -104,7 +104,7 @@ if __name__ == '__main__':
         nb_epoch=nb_epoch,
         validation_data= valid_generator,
         nb_val_samples= valid_generator.n/10,
-        callbacks=[TensorBoard(log_dir='/tmp/ageClass_v1')])
+        callbacks=[TensorBoard(log_dir='/tmp/ageClass_vgg')])
 
     model.save("ageClass_model.h5")
     pickle.dump(mhist.history,open("modelHistory.pkl","wb"))

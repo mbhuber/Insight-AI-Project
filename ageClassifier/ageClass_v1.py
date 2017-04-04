@@ -12,7 +12,7 @@ from keras.layers import Conv2D, MaxPooling2D, Lambda, Reshape, UpSampling2D
 from keras.layers.pooling import AveragePooling2D
 from keras.layers import Activation, Dropout, Flatten, Dense, BatchNormalization
 from keras.layers.advanced_activations import LeakyReLU
-
+from keras.optimizers import Adam
 
 from keras.preprocessing.image import ImageDataGenerator
 import keras.backend as K
@@ -23,16 +23,16 @@ K.set_image_dim_ordering('th')
 
 def setDataParameters():
     imaDim   = 64
-    numClass = 6
+    numClass = 5
     return (imaDim,numClass)
 
 def setModelParameters():
     batchSize   = 128
-    nb_epoch    =  50
+    nb_epoch    =  100
     return (batchSize, nb_epoch)
 
 def setDataPaths():
-    pipePath = '../../data/imdb-wiki_crop_clean_align64_kerasPipe3/'
+    pipePath = '../../data/imdb-wiki_crop_clean_align64_kerasPipe4/'
     trainDir = pipePath + "train/"
     testDir  = pipePath + "valid/"
     return (trainDir, testDir)
@@ -53,6 +53,7 @@ def getModelArch(imaDim=128, numClass=6):
     model.add(Activation('relu'))
     model.add(BatchNormalization(axis=1))
     model.add(MaxPooling2D(pool_size=(2, 2)))
+    model.add(Dropout(0.3))
 
     model.add(Conv2D(64, 3, 3))
     model.add(Activation('relu'))
@@ -101,7 +102,7 @@ if __name__ == '__main__':
 
     # compile
     model.compile(loss='categorical_crossentropy',
-              optimizer='rmsprop',
+              optimizer=Adam(lr=0.0002, beta_1=0.9),#'rmsprop',
               metrics=['accuracy'])
 
     mhist= model.fit_generator(
