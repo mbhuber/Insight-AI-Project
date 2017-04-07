@@ -33,7 +33,8 @@ from PIL import Image
 from six.moves import range
 
 import keras.backend as K
-from keras.layers import Input, Dense, Reshape, Flatten, Embedding, merge, Dropout, BatchNormalization, Activation
+from keras.layers import Input, Dense, Reshape, Flatten, Embedding, Dropout, BatchNormalization, Activation
+from keras.layers import multiply
 from keras.layers.pooling import AveragePooling2D
 from keras.layers.advanced_activations import LeakyReLU
 from keras.layers.convolutional import Conv2D, Conv2DTranspose
@@ -126,14 +127,14 @@ def build_generator(latent_size):
 
     # 10 classes in MNIST
     cls = Flatten()(Embedding(numClass, latent_size,
-                              init=weightInit)(image_class))
+                    embeddings_initializer=weightInit)(image_class))
 
     # hadamard product between z-space and a class conditional embedding
-    h = merge([latent, cls], mode='mul')
+    h = multiply([latent, cls])
 
     fake_image = cnn(h)
 
-    return Model(input=[latent, image_class], output=fake_image)
+    return Model(inputs=[latent, image_class], outputs=fake_image)
 #
 # Discriminator
 #
@@ -183,7 +184,7 @@ def build_discriminator():
     fake = Dense(1, activation='linear', name='generation')(features)
     aux = Dense(numClass, activation='softmax', name='auxiliary')(features)
 
-    return Model(input=image, output=[fake, aux])
+    return Model(inputs=image, outputs=[fake, aux])
 
 if __name__ == '__main__':
     # for create image generators
@@ -219,7 +220,7 @@ if __name__ == '__main__':
     # we only want to be able to train generation for the combined model
     discriminator.trainable = False
     fake, aux = discriminator(fake)
-    combined = Model(input=[latent, image_class], output=[fake, aux])
+    combined = Model(inputs=[latent, image_class], outputs=[fake, aux])
 
     combined.compile(
         optimizer='RMSprop',
